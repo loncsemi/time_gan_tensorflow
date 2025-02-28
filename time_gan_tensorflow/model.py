@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import os
 
 from time_gan_tensorflow.utils import time_series_to_sequences, sequences_to_time_series
 from time_gan_tensorflow.modules import encoder_embedder, encoder, decoder, generator_embedder, generator, discriminator, simulator
@@ -189,3 +190,29 @@ class TimeGAN():
         x_sim = self.mu + self.sigma * x_sim
     
         return x_sim
+
+    def save_model(self, model_name, path='models'):
+        '''
+        Save the model to the specified path.
+        '''
+        os.makedirs(path, exist_ok=True)
+        self.autoencoder_model.save(f'{path}/{model_name}/autoencoder_model')
+        self.generator_model.save(f'{path}/{model_name}/generator_model')
+        self.discriminator_model.save(f'{path}/{model_name}/discriminator_model')
+        np.save(f'{path}/{model_name}/mu.npy', self.mu)
+        np.save(f'{path}/{model_name}/sigma.npy', self.sigma)
+
+    def load_model(self, model_name, path='models'):
+        '''
+        Load the model from the specified path.
+        '''
+        self.autoencoder_model = tf.keras.models.load_model(f'{path}/{model_name}/autoencoder_model', compile=False)
+        self.generator_model = tf.keras.models.load_model(f'{path}/{model_name}/generator_model', compile=False)
+        self.discriminator_model = tf.keras.models.load_model(f'{path}/{model_name}/discriminator_model', compile=False)
+        self.mu = np.load(f'{path}/{model_name}/mu.npy')
+        self.sigma = np.load(f'{path}/{model_name}/sigma.npy')
+        
+        # Compile the models
+        self.autoencoder_model.compile(optimizer=self.autoencoder_optimizer)
+        self.generator_model.compile(optimizer=self.generator_optimizer)
+        self.discriminator_model.compile(optimizer=self.discriminator_optimizer)
