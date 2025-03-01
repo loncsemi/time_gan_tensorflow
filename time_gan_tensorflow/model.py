@@ -161,21 +161,34 @@ class TimeGAN():
 
     def save_model(self, model_name, path='models'):
         """
-        Save the trained models.
+        Save the trained models using the `.keras` format.
         """
-        os.makedirs(path, exist_ok=True)
-        self.autoencoder_model.save(f'{path}/{model_name}/autoencoder_model')
-        self.generator_model.save(f'{path}/{model_name}/generator_model')
-        self.discriminator_model.save(f'{path}/{model_name}/discriminator_model')
+        os.makedirs(f'{path}/{model_name}', exist_ok=True)
+
+        # Save in the recommended `.keras` format
+        self.autoencoder_model.save(f'{path}/{model_name}/autoencoder_model.keras')
+        self.generator_model.save(f'{path}/{model_name}/generator_model.keras')
+        self.discriminator_model.save(f'{path}/{model_name}/discriminator_model.keras')
+
+        # Save normalization parameters
         np.save(f'{path}/{model_name}/mu.npy', self.mu)
         np.save(f'{path}/{model_name}/sigma.npy', self.sigma)
+
 
     def load_model(self, model_name, path='models'):
         """
         Load trained models from disk.
         """
-        self.autoencoder_model = tf.keras.models.load_model(f'{path}/{model_name}/autoencoder_model', compile=False)
-        self.generator_model = tf.keras.models.load_model(f'{path}/{model_name}/generator_model', compile=False)
-        self.discriminator_model = tf.keras.models.load_model(f'{path}/{model_name}/discriminator_model', compile=False)
+        self.autoencoder_model = tf.keras.models.load_model(f'{path}/{model_name}/autoencoder_model.keras', compile=False)
+        self.generator_model = tf.keras.models.load_model(f'{path}/{model_name}/generator_model.keras', compile=False)
+        self.discriminator_model = tf.keras.models.load_model(f'{path}/{model_name}/discriminator_model.keras', compile=False)
+
+        # Load normalization parameters
         self.mu = np.load(f'{path}/{model_name}/mu.npy')
         self.sigma = np.load(f'{path}/{model_name}/sigma.npy')
+
+        # Recompile the models after loading
+        self.autoencoder_model.compile(optimizer=self.autoencoder_optimizer)
+        self.generator_model.compile(optimizer=self.generator_optimizer)
+        self.discriminator_model.compile(optimizer=self.discriminator_optimizer)
+
