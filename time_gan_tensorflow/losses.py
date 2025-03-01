@@ -15,3 +15,5 @@ def binary_crossentropy(y_true, y_pred):
     Binary cross-entropy, used for calculating the unsupervised loss.
     """
     bce = tf.keras.losses.BinaryCrossentropy(from_logits=False, reduction=tf.keras.losses.Reduction.NONE)
+    loss = bce(y_true, y_pred)
+    return tf.reduce_mean(loss)
