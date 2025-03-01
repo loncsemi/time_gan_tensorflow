@@ -2,6 +2,18 @@ import numpy as np
 import tensorflow as tf
 import os
 
+# Check for GPU availability
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+
+# Enable GPU memory growth
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+
 from time_gan_tensorflow.utils import time_series_to_sequences, sequences_to_time_series
 from time_gan_tensorflow.modules import encoder_embedder, encoder, decoder, generator_embedder, generator, discriminator, simulator
 from time_gan_tensorflow.losses import binary_crossentropy, mean_squared_error
